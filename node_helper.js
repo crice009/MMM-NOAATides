@@ -43,7 +43,7 @@ module.exports = NodeHelper.create({
             }
         });
 
-        // I WISH THIS WORKED -- there is probably something silly that I don't konw to make this happen...
+        // // I WISH THIS WORKED -- there is probably something silly that I don't konw to make this happen...
         // fetch(API_URLs.measured)
         //     .then(response => {
         //         if (!response.ok) {
@@ -69,7 +69,7 @@ module.exports = NodeHelper.create({
             }
         });
 
-        // I WISH THIS WORKED -- there is probably something silly that I don't konw to make this happen...
+        // // I WISH THIS WORKED -- there is probably something silly that I don't konw to make this happen...
         // fetch(API_URLs.predicted)
         //     .then(response => {
         //         if (!response.ok) {
