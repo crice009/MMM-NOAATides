@@ -1,0 +1,26 @@
+{
+    "name": "MMM-NOAATides",
+    "version": "1.0.0",
+    "description": "MagicMirror2 Module to graphically present tide predictions for given NOAA tide station.",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/crice009/MMM-NOAATides"
+    },
+    "keywords": [
+        "magic mirror",
+        "smart mirror",
+        "tide",
+        "high water",
+        "low water",
+        "cool graphs"
+    ],
+    "author": "Corey Rice ---> Inspired by Stefan Krause, helped by Sam Detweiler",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/crice009/MMM-NOAATides/issues"
+    },
+    "homepage": "https://github.com/crice009/MMM-NOAATides#readme",
+    "dependencies": {
+        "chart.js": "^2.5.0"
+    }
+}
