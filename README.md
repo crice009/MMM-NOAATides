@@ -2,7 +2,7 @@
 
 This an extension for the [MagicMirror](https://github.com/MichMich/MagicMirror).
 
-![Alt text](docs/Capture.PNG?raw=true "MMM-NOAATides screenshot")
+![Alt text](Capture.PNG?raw=true "MMM-NOAATides screenshot")
 
 It graphs low and high tide predictions for a given tide stations, and measured data as it is reported. Data is pulled from [NOAA-tidesandcurrents](https://tidesandcurrents.noaa.gov/map/index.html). Data is a free service paid for, by tax dollars. Go USA!
 
