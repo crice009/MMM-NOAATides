@@ -53,10 +53,10 @@ module.exports = NodeHelper.create({
                 return response;
             })
             .then(response => response.json())
-            .then(data => self.processPredictedTidesData(data));
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then(data => self.processPredictedTidesData(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            });
 
         let string_NOAA = JSON.stringify(self._NOAA);
         self.sendSocketNotification('NOAA_TIDES_RESULT', string_NOAA);
