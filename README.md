@@ -9,7 +9,7 @@ It graphs low and high tide predictions for a given tide stations, and measured 
 ## Dependencies
 
 * An installation of [MagicMirror<sup>2</sup>](https://github.com/MichMich/MagicMirror)
-* Packages: chartjs & node-fetch, both loaded via npm install
+* Packages: `chartjs` & `node-fetch`, both loaded via npm install
 
 ## Installation
 
@@ -21,7 +21,7 @@ It graphs low and high tide predictions for a given tide stations, and measured 
     ```
       {
         module: "MMM-NOAATides",
-        position: "top_right",
+        position: "top_right", //put this below a weather module in config.js, and so it is on screen
         config: {
           stationID: 8465705, // this happens to be the station at New Haven, CT
           datum: "MSL", // "mean sea level"
