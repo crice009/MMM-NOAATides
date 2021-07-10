@@ -14,7 +14,8 @@
         "low water",
         "cool graphs"
     ],
-    "author": "Corey Rice ---> Inspired by Stefan Krause, helped by Sam Detweiler",
+    "author": "By Corey Rice - Gracious help from Sam Detweiler & Karsten13 (on MM Discord)",
+
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/crice009/MMM-NOAATides/issues"
@@ -22,7 +23,6 @@
     "homepage": "https://github.com/crice009/MMM-NOAATides#readme",
     "dependencies": {
         "chart.js": "^2.5.0",
-        "node-fetch": "^2.6.1",
-        "request": "^2.88.2"
+        "node-fetch": "^2.6.1"
     }
 }

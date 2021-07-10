@@ -1,21 +1,20 @@
 /* Magic Mirror
  * Node Helper: MMM-NOAATides
  *
- * By Corey Rice
+ * By Corey Rice - Gracious help from Sam Detweiler & Karsten13 (on MM Discord)
  * MIT Licensed.
  */
 
 var NodeHelper = require("node_helper");
 var fetch = require("node-fetch");
-var request = require('request');
 
 module.exports = NodeHelper.create({
     _NOAA: {
         station_name: "", //use the station ID number temporarily
-        measured_times: [], //an empty array to be filled in steps below
-        measured_tides: [], //an empty array to be filled in steps below
-        predicted_times: [], //an empty array to be filled in steps below
-        predicted_tides: [], //an empty array to be filled in steps below
+        measured_times: [], //an empty array to be filled in below
+        measured_tides: [], //an empty array to be filled in below
+        predicted_times: [], //an empty array to be filled in below
+        predicted_tides: [], //an empty array to be filled in below
     },
     // Subclass start method.
     start: function() {
@@ -31,57 +30,33 @@ module.exports = NodeHelper.create({
     NOAATidesRequest: function(API_URLs) {
         var self = this;
 
-        // OUTDATED, but definitely works...
-        request({ url: API_URLs.measured, method: 'GET' }, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                // console.log(body);
-                var response = JSON.parse(body);
-                // console.log(response);
-                self.processMeasuredTidesData(response);
-            } else {
-                console.error("Bad request for MMM-NOAATides | Measured-Data: " + API_URLs.measured)
-            }
+        fetch(API_URLs.measured) //get the tides from NOAA
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Predicted tides NOAA API response was not ok');
+                }
+                //console.log(response); //only uncomment this if you are checking for data returned by NOAA/ trying to see the format -- still in JSON format
+                return response;
+            })
+            .then(response => response.json())
+            .then(data => self.processMeasuredTidesData(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+        fetch(API_URLs.predicted) //get the tides from NOAA
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Predicted tides NOAA API response was not ok! -- Check API URL or parameters');
+                }
+                // console.log(response); //only uncomment this if you are checking for data returned by NOAA/ trying to see the format -- still in JSON format
+                return response;
+            })
+            .then(response => response.json())
+            .then(data => self.processPredictedTidesData(data));
+        .catch((error) => {
+            console.error('Error:', error);
         });
-
-        // // I WISH THIS WORKED -- there is probably something silly that I don't konw to make this happen...
-        // fetch(API_URLs.measured)
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('Predicted tides NOAA API response was not ok');
-        //         }
-        //         //console.log(response); //only uncomment this if you are checking for data returned by NOAA/ trying to see the format -- still in JSON format
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => self.processMeasuredTidesData(data))
-        //     .catch((error) => {
-        //         console.error('Error:', error);
-        //     });
-
-        // OUTDATED, but definitely works...
-        request({ url: API_URLs.predicted, method: 'GET' }, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                // console.log(body);
-                var response = JSON.parse(body);
-                // console.log(response);
-                self.processPredictedTidesData(response);
-            } else {
-                console.error("Bad request for MMM-NOAATides | Predicted-Data: " + API_URLs.predicted)
-            }
-        });
-
-        // // I WISH THIS WORKED -- there is probably something silly that I don't konw to make this happen...
-        // fetch(API_URLs.predicted)
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('Predicted tides NOAA API response was not ok! -- Check API URL or parameters');
-        //         }
-        //         // console.log(response); //only uncomment this if you are checking for data returned by NOAA/ trying to see the format -- still in JSON format
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => self.processPredictedTidesData(data));
-        //     .catch((error) => {
-        //         console.error('Error:', error);
-        //     });
 
         let string_NOAA = JSON.stringify(self._NOAA);
         self.sendSocketNotification('NOAA_TIDES_RESULT', string_NOAA);

@@ -3,7 +3,7 @@
 /* Magic Mirror
  * Module: MMM-NOAATides
  *
- * By Corey Rice
+ * By Corey Rice - Gracious help from Sam Detweiler & Karsten13 (on MM Discord)
  * MIT Licensed.
  */
 
@@ -41,8 +41,8 @@ Module.register('MMM-NOAATides', {
         units: "english", //or "metric"
 
         updateInterval: 2500, //this is the delay for API calls
-        animationSpeed: 1000 * 60, // will be every 6 minutes, to coincide with how often NOAA updates their data
-        initialLoadDelay: 2500, // 1000 millisecond delay, so the node_helper has some time at start-up
+        animationSpeed: 1000 * 60 * 6, // will be every 6 minutes, to coincide with how often NOAA updates their data
+        initialLoadDelay: 2500, // millisecond delay, so the node_helper has some time at start-up
         retryDelay: 2500, //to not overwhelm the API service
 
         apiBase: "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date="
