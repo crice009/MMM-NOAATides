@@ -37,7 +37,7 @@ The following properties can be configured:
 
 | **Option** | **Values** | **Description** |
 | --- | --- | --- |
-| `stationID` | **REQUIRED** | The ID number of the NOAA tide station you want to graph. You can find your local tide station, and the code you want [here](https://tidesandcurrents.noaa.gov/map/index.html).
+| `stationID` | **REQUIRED** | The ID number of the NOAA tide station you want to graph. You can find your local tide station, and the code you want [here](https://tidesandcurrents.noaa.gov/map/index.html). https://tidesandcurrents.noaa.gov/map/
 | `datum` | OPTIONAL | The selected is "[mean sea level](https://tidesandcurrents.noaa.gov/datum_options.html)." You probably want to stick to that option.
 | `time` | OPTIONAL | Local standard time/ daylight time -- other options available, but you don't want them...
 | `units` | OPTIONAL | This defaults to whatever your Magic Mirror units are set to be. The only reason to use is to switch to `metric` tide-heights.
