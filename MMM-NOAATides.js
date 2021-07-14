@@ -45,12 +45,25 @@ Module.register('MMM-NOAATides', {
         initialLoadDelay: 2500, // millisecond delay, so the node_helper has some time at start-up
         retryDelay: 2500, //to not overwhelm the API service
 
-        apiBase: "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date="
-    },
+        apiBase: "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=",
 
-    // init: function() {
-    //     Log.log(this.name + " is in init!");
-    // },
+        chartJS: {
+            measured: {
+                backgroundColor: "rgba(31, 133, 224, 0.25)", //color the area-under a subtle blue
+                borderColor: "rgb(31, 133, 224, 0.75)", //color the line blue-ish
+                pointBorderColor: "rgba(31, 133, 224, 0)", //give the points a border - maybe not...
+                pointBackgroundColor: "rgba(31, 133, 224, 0)" //point infill - maybe not...
+            },
+            predicted: {
+                borderColor: "gray", //color the line orange-ish
+                pointBorderColor: "rgba(0,0,0,0)", //hide the points --> alpha = 0 
+                pointBackgroundColor: "rgba(0,0,0,0)" //hide 'fill' of the points --> alpha = 0 
+            },
+            animationDuration: 0, //time to expand datapoints away from zero on the X axis
+            aspectRatio: 1.618, // 1=square || >1 is wider than tall || <1 taller than wide 
+            fillBetween: true, //colors-in area between predicted and 
+        }
+    },
 
     start: function() {
         Log.log(this.name + " is starting!");
@@ -72,6 +85,8 @@ Module.register('MMM-NOAATides', {
         }, this.config.animationSpeed); //redraw this often...
     },
 
+
+    //Rebuild the API parameters every time there is a call, send that along to the  
     getNewTides: function() {
         var self = this; //needed for the lines below
 
@@ -97,12 +112,7 @@ Module.register('MMM-NOAATides', {
     // return list of other functional scripts to use, if any (like require in node_helper)
     getScripts: function() {
         return [
-            // sample of list of files to specify here, if no files,do not use this routine, or return empty list
             "modules/" + this.name + "/node_modules/chart.js/dist/Chart.min.js",
-            //'script.js', // will try to load it from the vendor folder, otherwise it will load is from the module folder.
-            //'moment.js', // this file is available in the vendor folder, so it doesn't need to be available in the module folder.
-            //this.file('anotherfile.js'), // this file will be loaded straight from the module folder.
-            //'https://code.jquery.com/jquery-2.2.3.min.js',  // this file will be loaded from the jquery servers.
         ]
     },
     getStyles: function() {
@@ -198,22 +208,22 @@ Module.register('MMM-NOAATides', {
                 }, {
                     label: 'Measured', //label in the legend, at the top
                     data: this.NOAA.measured_tides, //Y-axis data source for this one
-                    "fill": '+1', //color the area between this and the next data ('filler' below in options)
-                    "backgroundColor": "rgba(31, 133, 224, 0.25)", //color the area-under a subtle blue
-                    "borderColor": "rgb(31, 133, 224, 0.75)", //color the line blue-ish
-                    "pointBorderColor": "rgba(0,0,0,0)", //hide the points --> alpha = 0 
-                    "pointBackgroundColor": "rgba(0,0,0,0)" //hide 'fill' of the points --> alpha = 0 
+                    "fill": (this.config.chartJS.fillBetween) ? '+1' : false, //color the area between this and the next data ('filler' below in options)
+                    "backgroundColor": this.config.chartJS.measured.backgroundColor, //color the area-under a subtle blue
+                    "borderColor": this.config.chartJS.measured.borderColor, //color the line blue-ish
+                    "pointBorderColor": this.config.chartJS.measured.pointBorderColor, //hide the points --> alpha = 0 
+                    "pointBackgroundColor": this.config.chartJS.measured.pointBackgroundColor //hide 'fill' of the points --> alpha = 0 
                 }, {
                     label: 'Predicted', //label in the legend, at the top
                     data: this.NOAA.predicted_tides, //Y-Axis data source for this one
                     "fill": false, //don't color the area under the curve 
-                    "borderColor": "gray", //color the line orange-ish
-                    "pointBorderColor": "rgba(0,0,0,0)", //hide the points --> alpha = 0 
-                    "pointBackgroundColor": "rgba(0,0,0,0)" //hide 'fill' of the points --> alpha = 0 
+                    "borderColor": this.config.chartJS.predicted.borderColor, //color the line orange-ish
+                    "pointBorderColor": this.config.chartJS.predicted.pointBorderColor, //hide the points --> alpha = 0 
+                    "pointBackgroundColor": this.config.chartJS.predicted.pointBackgroundColor //hide 'fill' of the points --> alpha = 0 
                 }]
             },
             options: { //set the options for the chart (this is how chart.js like to do it -- config file style)
-                aspectRatio: 1.618, //golden ratio, because we're fancy! (chande this to change the squareness)
+                aspectRatio: this.config.chartJS.aspectRatio, //golden ratio, because we're fancy! (chande this to change the squareness)
                 // the chart width decides the sizes, and has to be set in the getDom() or CSS file only absolute sizes work: https://www.chartjs.org/docs/3.0.2/configuration/responsive.html
                 scales: { //the options for X & Y scales
                     yAxes: [{ //set-up the formatting for the Y-axis
@@ -246,9 +256,9 @@ Module.register('MMM-NOAATides', {
                     }]
                 },
                 animation: { //the options for animations
-                    duration: 0 //the default here is 400ms
+                    duration: this.config.chartJS.animationDuration //the default here is 400ms
                         //the animation has to be zero, since the interval timer would invoke an animation
-                        //setting to zero make the graph look static, new data just 'pops' into exsistence
+                        //setting to zero make the graph look static, new data just appears into exsistence
                 },
                 plugins: { //apparently this isn't part of standard settings
                     filler: { //these are how you fine-tune the 'fill' option

@@ -89,5 +89,10 @@ module.exports = NodeHelper.create({
             self._NOAA.predicted_times.push(new Date(element.t)); //store the times as time objects
             self._NOAA.predicted_tides.push(Number(element.v)); //store the heights as numbers
         })
+
+        //only predicted tides need the end of the day added -- they always cover the 24hrs
+        let t = new Date();
+        let endOfDay = new Date(t.getFullYear(), t.getMonth(), t.getDate(), 23, 59, 59);
+        self._NOAA.predicted_times.push(endOfDay);
     },
 });
