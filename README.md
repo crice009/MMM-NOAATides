@@ -27,9 +27,6 @@ The module graphs low and high tide predictions for a given tide stations, and m
           datum: "MSL", // "mean sea level"
           time: "lst_ldt", // local standard time/ daylight time
           units: "english", // or "metric"
-          chartJS:{
-            aspectRatio: 1.618
-          }
         }
       }
     ```
