@@ -99,8 +99,18 @@ Module.register('MMM-NOAATides', {
         if (date < 10) date = "0" + String(date); //prepend a zero if less than 10, then make it a string
         const NOAA_today = year + month + date; //concatenate for a proper NOAA date string
 
+        //==== test--> have predictions extend to tomorrow ===== https://github.com/crice009/MMM-NOAATides/issues/3
+        let tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1); // sets the date to tomorrow        
+        let tomorrow_year = String(tomorrow.getFullYear()); //turn the year into a string
+        let tomorrow_month = tomorrow.getMonth() + 1; //js months are zero-referenced, NOAAs aren't --> so +1 to the month
+        if (tomorrow_month < 10) tomorrow_month = "0" + String(month); //prepend a zero if less than 10, then make it a string
+        let tomorrow_day = today.getDate(); //the date is one-referenced, so no funny business here
+        if (tomorrow_day < 10) tomorrow_day = "0" + String(date); //prepend a zero if less than 10, then make it a string
+        const NOAA_tomorrow = tomorrow_year + tomorrow_month + tomorrow_day; //concatenate for a proper NOAA date string
+
         //Update the URLs for the parameters at hand...
-        this.APIparams.predicted = this.config.apiBase + NOAA_today + "&end_date=" + NOAA_today + "&station=" + this.config.stationID + "&product=" + "predictions" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
+        this.APIparams.predicted = this.config.apiBase + NOAA_today + "&end_date=" + NOAA_tomorrow + "&station=" + this.config.stationID + "&product=" + "predictions" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
         this.APIparams.measured = this.config.apiBase + NOAA_today + "&end_date=" + NOAA_today + "&station=" + this.config.stationID + "&product=" + "water_level" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
 
         var request_params = JSON.stringify(self.APIparams);
