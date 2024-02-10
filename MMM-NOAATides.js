@@ -87,37 +87,45 @@ Module.register('MMM-NOAATides', {
 
 
     //Rebuild the API parameters every time there is a call, send that along to the  
+
     getNewTides: function() {
-        var self = this; //needed for the lines below
-
-        //==== NOAA date format ====================
-        const today = new Date(); //create a Date() object for today
-        let year = String(today.getFullYear()); //turn the year into a string
-        let month = today.getMonth() + 1; //js months are zero-referenced, NOAAs aren't --> so +1 to the month
-        if (month < 10) month = "0" + String(month); //prepend a zero if less than 10, then make it a string
-        let date = today.getDate(); //the date is one-referenced, so no funny business here
-        if (date < 10) date = "0" + String(date); //prepend a zero if less than 10, then make it a string
-        const NOAA_today = year + month + date; //concatenate for a proper NOAA date string
-
-        //==== test--> have predictions extend to tomorrow ===== https://github.com/crice009/MMM-NOAATides/issues/3
-        let tomorrow = new Date();
-        tomorrow.setDate(today.getDate() + 1); // sets the date to tomorrow        
-        let tomorrow_year = String(tomorrow.getFullYear()); //turn the year into a string
-        let tomorrow_month = tomorrow.getMonth() + 1; //js months are zero-referenced, NOAAs aren't --> so +1 to the month
-        if (tomorrow_month < 10) tomorrow_month = "0" + String(month); //prepend a zero if less than 10, then make it a string
-        let tomorrow_day = today.getDate(); //the date is one-referenced, so no funny business here
-        if (tomorrow_day < 10) tomorrow_day = "0" + String(date); //prepend a zero if less than 10, then make it a string
-        const NOAA_tomorrow = tomorrow_year + tomorrow_month + tomorrow_day; //concatenate for a proper NOAA date string
-
-        //Update the URLs for the parameters at hand...
-        this.APIparams.predicted = this.config.apiBase + NOAA_today + "&end_date=" + NOAA_tomorrow + "&station=" + this.config.stationID + "&product=" + "predictions" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
-        this.APIparams.measured = this.config.apiBase + NOAA_today + "&end_date=" + NOAA_today + "&station=" + this.config.stationID + "&product=" + "water_level" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
-
+        var self = this;
+    
+        const now = new Date(); // get current date and time
+        const currentHour = now.getHours();
+        const startDateTime = new Date(now); // clone the current date and time
+    
+        // Set the start time to the beginning of the previous hour
+        startDateTime.setMinutes(0);
+        startDateTime.setSeconds(0);
+        startDateTime.setMilliseconds(0);
+        startDateTime.setHours(currentHour - 1);
+    
+        // Calculate the end time as 23 hours ahead
+        const endDateTime = new Date(startDateTime);
+        endDateTime.setHours(currentHour + 23);
+    
+        // Format startDateTime and endDateTime into NOAA date format
+        const startYear = String(startDateTime.getFullYear());
+        const startMonth = (startDateTime.getMonth() + 1).toString().padStart(2, '0');
+        const startDate = startDateTime.getDate().toString().padStart(2, '0');
+        const NOAA_start = startYear + startMonth + startDate;
+    
+        const endYear = String(endDateTime.getFullYear());
+        const endMonth = (endDateTime.getMonth() + 1).toString().padStart(2, '0');
+        const endDate = endDateTime.getDate().toString().padStart(2, '0');
+        const NOAA_end = endYear + endMonth + endDate;
+    
+        // Update the URLs for the parameters at hand...
+        this.APIparams.predicted = this.config.apiBase + NOAA_start + "&end_date=" + NOAA_end + "&station=" + this.config.stationID + "&product=" + "predictions" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
+        this.APIparams.measured = this.config.apiBase + NOAA_start + "&end_date=" + NOAA_end + "&station=" + this.config.stationID + "&product=" + "water_level" + "&datum=" + this.config.datum + "&time_zone=" + this.config.time + "&units=" + this.NOAA.units + "&format=json";
+    
         var request_params = JSON.stringify(self.APIparams);
         self.sendSocketNotification('START', request_params);
-
-        self.updateDom(); //this is a function baked-into MM, that calls 'getDOM()'
+    
+        self.updateDom();
     },
+
 
     // return list of other functional scripts to use, if any (like require in node_helper)
     getScripts: function() {
