@@ -196,76 +196,105 @@ Module.register('MMM-NOAATides', {
      *  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \
      * /    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \
      */ //==== Draw the graph using the 'chart.js' library to do the heavy lifting ======================================
-    drawChart: function() {
-        this.NOAA.chart.content = new Chart(this.NOAA.chart.context, { //this is all really from https://www.chartjs.org/docs/master/
-            type: 'line', // make the whole thing a line chart
-            data: {
-                labels: this.NOAA.predicted_times, //the X-axis is where the time-of-day goes
-                //the predicted_times are used, because they're always the full 24 hours (don't have times for measured values before they happen)
-                datasets: [{
-                    label: this.NOAA.station_name, //just an empty part of the chart
-                    data: ""
-                }, {
-                    label: 'Measured', //label in the legend, at the top
-                    data: this.NOAA.measured_tides, //Y-axis data source for this one
-                    "fill": (this.config.chartJS.fillBetween) ? '+1' : false, //color the area between this and the next data ('filler' below in options)
-                    "backgroundColor": this.config.chartJS.measured.backgroundColor, //color the area-under a subtle blue
-                    "borderColor": this.config.chartJS.measured.borderColor, //color the line blue-ish
-                    "pointBorderColor": this.config.chartJS.measured.pointBorderColor, //hide the points --> alpha = 0 
-                    "pointBackgroundColor": this.config.chartJS.measured.pointBackgroundColor //hide 'fill' of the points --> alpha = 0 
-                }, {
-                    label: 'Predicted', //label in the legend, at the top
-                    data: this.NOAA.predicted_tides, //Y-Axis data source for this one
-                    "fill": false, //don't color the area under the curve 
-                    "borderColor": this.config.chartJS.predicted.borderColor, //color the line orange-ish
-                    "pointBorderColor": this.config.chartJS.predicted.pointBorderColor, //hide the points --> alpha = 0 
-                    "pointBackgroundColor": this.config.chartJS.predicted.pointBackgroundColor //hide 'fill' of the points --> alpha = 0 
+    /*   /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\    /\
+ *  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \  /  \
+ * /    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \
+ */ //==== Draw the graph using the 'chart.js' library to do the heavy lifting ======================================
+drawChart: function() {
+    // Convert times to Date objects and pair with tide data
+    const measuredData = this.NOAA.measured_times.map(function(time, index) {
+        return {
+            x: new Date(time),
+            y: this.NOAA.measured_tides[index]
+        };
+    }.bind(this));
+
+    const predictedData = this.NOAA.predicted_times.map(function(time, index) {
+        return {
+            x: new Date(time),
+            y: this.NOAA.predicted_tides[index]
+        };
+    }.bind(this));
+
+    const currentTime = new Date(); // Current time as Date object
+
+    this.NOAA.chart.content = new Chart(this.NOAA.chart.context, { //this is all really from https://www.chartjs.org/docs/master/
+        type: 'line', // make the whole thing a line chart
+        data: {
+            datasets: [{
+                label: 'Measured', //label in the legend, at the top
+                data: measuredData, //X and Y-axis data source for this one
+                "fill": (this.config.chartJS.fillBetween) ? '+1' : false, //color the area between this and the next data ('filler' below in options)
+                "backgroundColor": this.config.chartJS.measured.backgroundColor, //color the area-under a subtle blue
+                "borderColor": this.config.chartJS.measured.borderColor, //color the line blue-ish
+                "pointBorderColor": this.config.chartJS.measured.pointBorderColor, //hide the points --> alpha = 0 
+                "pointBackgroundColor": this.config.chartJS.measured.pointBackgroundColor //hide 'fill' of the points --> alpha = 0 
+            }, {
+                label: 'Predicted', //label in the legend, at the top
+                data: predictedData, //X and Y-axis data source for this one
+                "fill": false, //don't color the area under the curve 
+                "borderColor": this.config.chartJS.predicted.borderColor, //color the line gray
+                "pointBorderColor": this.config.chartJS.predicted.pointBorderColor, //hide the points --> alpha = 0 
+                "pointBackgroundColor": this.config.chartJS.predicted.pointBackgroundColor //hide 'fill' of the points --> alpha = 0 
+            }]
+        },
+        options: { //set the options for the chart (this is how chart.js like to do it -- config file style)
+            aspectRatio: this.config.chartJS.aspectRatio, //golden ratio, because we're fancy! (change this to adjust the squareness)
+            scales: { //the options for X & Y scales
+                yAxes: [{ //set-up the formatting for the Y-axis
+                    ticks: { //specifically, the labels
+                        beginAtZero: true,
+                        //take what would have been the labels, and modify them
+                        callback: function(value, index, values) {
+                            let chartUnits = ' ft'; //filler label
+                            //change things if the user wants metric
+                            if (this.NOAA.units === "metric") chartUnits = " m";
+
+                            return (value + chartUnits); //return a nicely formatted label for each tick-mark
+                        }.bind(this)
+                    },
+                }],
+                xAxes: [{ //set-up the formatting for the X-axis
+                    type: 'time',
+                    time: {
+                        unit: 'hour',
+                        displayFormats: {
+                            hour: 'h:mm a'
+                        }
+                    },
+                    ticks: { //specifically, the labels
+                        source: 'auto',
+                        autoSkip: true,
+                        maxTicksLimit: 10
+                    }
                 }]
             },
-            options: { //set the options for the chart (this is how chart.js like to do it -- config file style)
-                aspectRatio: this.config.chartJS.aspectRatio, //golden ratio, because we're fancy! (chande this to change the squareness)
-                // the chart width decides the sizes, and has to be set in the getDom() or CSS file only absolute sizes work: https://www.chartjs.org/docs/3.0.2/configuration/responsive.html
-                scales: { //the options for X & Y scales
-                    yAxes: [{ //set-up the formatting for the Y-axis
-                        ticks: { //specifically, the labels
-                            beginAtZero: true,
-                            //take what would have been the labels, and modify them
-                            callback: function(value, index, values) {
-                                let chartUnits = ' ft'; //filler label
-                                //change things if the user wants metric
-                                //if (this.NOAA.units === "metric") chartUnits = " m";
-
-                                return (value + chartUnits); //return a nicely formatted label for each tick-mark
-                            }
-                        },
-                    }],
-                    xAxes: [{ //set-up the formatting for the Y-axis
-                        ticks: { //specifically, the labels
-                            //take what would have been the labels, and modify them
-                            callback: function(value, index, values) {
-                                //the 'incoming' data for these ticks are date strings
-                                const t = new Date(value); //turn them into Date() objects
-                                let hours = t.getHours(); //get the 'hours' of the new Date() object
-                                if (hours < 10) hours = '0' + String(hours); //prepend with a zero, if less than 10
-                                let minutes = t.getMinutes(); //get the 'minutes' of the new Date() object
-                                if (minutes < 10) minutes = '0' + String(minutes); //prepend with a zero, if less than 10
-                                const pretty_time = hours + ":" + minutes; //combine these into a 'pretty' time value
-                                return pretty_time; //this is what the tick-marks should really be...
-                            }
-                        },
+            animation: { //the options for animations
+                duration: this.config.chartJS.animationDuration //the default here is 400ms
+                //the animation has to be zero, since the interval timer would invoke an animation
+                //setting to zero makes the graph look static; new data just appears into existence
+            },
+            plugins: { //additional plugin settings
+                filler: { //these are how you fine-tune the 'fill' option
+                    propagate: true //allow filling in the area between the 2 curves
+                },
+                annotation: { //settings for the annotation plugin
+                    annotations: [{
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x-axis-0',
+                        value: currentTime, // Position of the current time line
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        label: {
+                            content: 'Current Time',
+                            enabled: true,
+                            position: 'top'
+                        }
                     }]
-                },
-                animation: { //the options for animations
-                    duration: this.config.chartJS.animationDuration //the default here is 400ms
-                        //the animation has to be zero, since the interval timer would invoke an animation
-                        //setting to zero make the graph look static, new data just appears into exsistence
-                },
-                plugins: { //apparently this isn't part of standard settings
-                    filler: { //these are how you fine-tune the 'fill' option
-                        propogate: true //allow filling in the area between the 2 curves
-                    }
                 }
             }
-        });
-    },
+        }
+    });
+},
 });
