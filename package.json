@@ -1,28 +1,28 @@
 {
-    "name": "MMM-NOAATides",
-    "version": "1.0.0",
-    "description": "MagicMirror2 Module to graphically present tide predictions for given NOAA tide station.",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/crice009/MMM-NOAATides"
-    },
-    "keywords": [
-        "magic mirror",
-        "smart mirror",
-        "tide",
-        "high water",
-        "low water",
-        "cool graphs"
-    ],
-    "author": "By Corey Rice - Gracious help from Sam Detweiler & Karsten13 (on MM Discord)",
-
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/crice009/MMM-NOAATides/issues"
-    },
-    "homepage": "https://github.com/crice009/MMM-NOAATides#readme",
-    "dependencies": {
-        "chart.js": "^2.5.0",
-        "node-fetch": "^2.6.1"
-    }
+  "name": "MMM-NOAATides",
+  "version": "1.0.0",
+  "description": "MagicMirror2 Module to graphically present tide predictions for given NOAA tide station.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crice009/MMM-NOAATides"
+  },
+  "keywords": [
+    "magic mirror",
+    "smart mirror",
+    "tide",
+    "high water",
+    "low water",
+    "cool graphs"
+  ],
+  "author": "By Corey Rice - Gracious help from Sam Detweiler & Karsten13 (on MM Discord)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/crice009/MMM-NOAATides/issues"
+  },
+  "homepage": "https://github.com/crice009/MMM-NOAATides#readme",
+  "dependencies": {
+    "chart.js": "^2.5.0",
+    "chartjs-plugin-annotation": "^0.5.7",
+    "node-fetch": "^2.6.1"
+  }
 }
